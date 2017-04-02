@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    .jumbotron
+        form(action='/', method='post', id='forma')
+          fieldset
+            .form-group.row
+              .col-sm-6
+                input.form-control(type='text', name='devID', placeholder='device identity') 
+              .col-sm-6
+                input.form-control(type='text', name='cs', placeholder='connection string') 
+                                         
+        button.btn.btn-space.btn-default(type='submit', name="action", form='forma', value='register') register
+        
+      p #{msg}
