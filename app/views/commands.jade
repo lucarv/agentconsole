@@ -8,7 +8,8 @@ block content
               .col-sm-6
                 input.form-control(type='text', name='devID', placeholder=deviceId) 
                                          
-        button.btn.btn-space.btn-warning(type='submit', name="action", form='formb', value='reboot') reboot
-        button.btn.btn-space.btn-default(type='submit', name="action", form='formb', value='query') query
-        
+        button.btn.btn-space.btn-danger(type='submit', name="action", form='formb', value='reboot') reboot
+        button.btn.btn-space.btn-default(type='submit', name="action", form='formb', value='last') last reboot
+        button.btn.btn-space.btn-default(type='submit', name="action", form='formb', value='location') location
+        button.btn.btn-space.btn-default(type='submit', name="action", form='formb', value='connectivity') connectivity
       p #{msg}

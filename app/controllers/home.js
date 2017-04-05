@@ -65,9 +65,9 @@ router.post('/dc', function (req, res, next) {
       });
       break;
 
-    case 'query':
+    case 'last':
       registry.getTwin(deviceId, function (err, twin) {
-        console.log('started query on twin')
+
         if (twin.properties.reported.iothubDM != null) {
           if (err) {
             msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
@@ -86,8 +86,47 @@ router.post('/dc', function (req, res, next) {
         });
 
       });
-
       break;
+    case 'location':
+      registry.getTwin(deviceId, function (err, twin) {
+
+        if (twin.properties.reported.location != null) {
+          if (err) {
+            msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
+          } else {
+            var location = twin.properties.reported.location.type;
+            msg = 'Device Zip Code: ' + location;
+          }
+        }
+        else
+          msg = 'no location has been reported by device';
+        res.render('commands', {
+          title: 'utility mgmt console',
+          deviceId: deviceId,
+          msg: msg
+        });
+      })
+        break;
+    case 'connectivity':
+      registry.getTwin(deviceId, function (err, twin) {
+
+        if (twin.properties.reported.location != null) {
+          if (err) {
+            msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
+          } else {
+            var location = twin.properties.reported.connectivity.type;
+            msg = 'Connectivity Type: ' + location;
+          }
+        }
+        else
+          msg = 'no connectivity has been reported by device';
+        res.render('commands', {
+          title: 'utility mgmt console',
+          deviceId: deviceId,
+          msg: msg
+        });
+      })
+        break;
   }
 
 
