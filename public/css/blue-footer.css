@@ -20,3 +20,8 @@
   color: #ffffff;
   padding: 20px 30px 50px 80px;
 }
+
+.col-form-label {
+    color: #17AEEB;
+    font-size: 75%;
+}

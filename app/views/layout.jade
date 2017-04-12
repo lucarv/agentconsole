@@ -11,6 +11,8 @@ html(lang='en')
       link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", rel="stylesheet")
       link(rel='stylesheet', href='/css/style.css')
       link(rel='stylesheet', href='/css/blue-footer.css')
+      script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js')
+      script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
 
     block js
       if ENV_DEVELOPMENT
@@ -29,15 +31,19 @@ html(lang='en')
 
       #navbar-inverse.collapse.navbar-collapse
         ul.nav.navbar-nav           
+          li.active 
+            a( href="/") Select Device            
+          li.dropdown
+            a.dropdown-toggle(href='#', data-toggle='dropdown')
+              | Device Twin 
+              b.caret
+            ul.dropdown-menu
+              li
+                a(href='/twin') Reported
+              li
+                a(href='/des') Desired
           li 
-            a( href="/", data-tooltip='select device to manage' ) 
-              span.glyphicon.glyphicon-modal-window              
-          li 
-            a( href="/twin", data-tooltip='display device properties' ) 
-              span.glyphicon.glyphicon-cog
-          li 
-            a( href="/commands", data-tooltip='commands' ) 
-              span.glyphicon.glyphicon-off
+            a( href="/commands") Commands
         ul.nav.navbar-nav.navbar-right
           li.ph device id
           form.navbar-form.navbar-left

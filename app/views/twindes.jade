@@ -1,0 +1,21 @@
+extends layout
+
+block content
+    .jumbotron
+        form(action='/des', method='post', id='formb')
+          fieldset
+            .form-group.row
+              .col-sm-3
+                .input-group
+                  span.input-group-btn
+                  select#form.form-control(name = "choice")
+                      option(value='') choose
+                      option(value='fw') fw version
+                      option(value='interval') reporting interval
+              .col-sm-3
+                input.form-control(type='text', name='prop', placeholder='enter desired property')  
+
+        button.btn.btn-primary(type='submit', form='formb', value='Submit') Submit
+
+      
+ 

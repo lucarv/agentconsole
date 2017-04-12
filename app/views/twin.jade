@@ -1,23 +1,30 @@
 extends layout
 
 block content
-    .jumbotron
-      .form-group
-        .col-sm-6
-            .input-group
-                span#sizing-addon2.input-group-addon last reboot 
-                input.form-control(type='text', placeholder=lastRebootTime)
-        .col-sm-6
-            .input-group
-                span#sizing-addon2.input-group-addon location
-                input.form-control(type='text', placeholder=location)
-        br
-        .col-sm-6
-            .input-group
-                span#sizing-addon2.input-group-addon connectivity
-                input.form-control(type='text', placeholder=connType)
-        .col-sm-6
-            .input-group
-                span#sizing-addon2.input-group-addon FW version
-                input.form-control(type='text', placeholder=version)
+        .jumbotron
+                form(action='/twin', method='post', id='twin')
+                    .form-group.row
+                        label.col-sm-3.col-form-label(for='lastRebootTime') Last Reboot
+                        .col-sm-9
+                            input#lastRebootTime.form-control-static.input-sm(type='text', placeholder=lastRebootTime)
+                    .form-group.row
+                        label.col-sm-3.col-form-label(for='location') Zip Code
+                        .col-sm-9
+                            input#location.form-control-static.input-sm(type='text', placeholder=location)
+                    .form-group.row
+                        label.col-sm-3.col-form-label(for='connType') Connectivity
+                        .col-sm-9
+                            input#connType.form-control-static.input-sm(type='text', placeholder=connType)
+                    .form-group.row
+                        label.col-sm-3.col-form-label(for='version') FW Version
+                        .col-sm-9
+                            input#version.form-control-static.input-sm(type='text', placeholder=version)
+                    .form-group.row
+                        label.col-sm-3.col-form-label(for='interval') Interval
+                        .col-sm-9
+                            input#inputPassword3.form-control-static.input-sm(type='text', placeholder=interval)
+                    .form-group.row
+                        .col-sm-4
+                            button.btn.btn-primary(name="action", type='submit', form='twin', value='refresh') refresh
+
 

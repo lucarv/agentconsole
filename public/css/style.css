@@ -38,5 +38,12 @@ p {
 }
 
 .btn-space {
-    margin-right: 5px;
+    margin-right: 10px;
+    background: #17AEEB;
+    color: #ffffff;
+    font-size: 75%;
+}
+
+.form-control-static {
+  max-height: 14
 }
