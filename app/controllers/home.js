@@ -16,9 +16,25 @@ var location = 'not yet reported',
   connType,
   version,
   interval,
+  lastRead,
   msg;
 
-function fetchReportedProperties(res, next) {
+function getDesiredProperties(res, next) {
+  registry.getTwin(deviceId, function (err, twin) {
+    var desiredFW = twin.properties.desired.fw.version;
+    var desiredInterval = twin.properties.desired.interval.ms;
+
+    res.render('twindes', {
+      title: 'utility mgmt console',
+      deviceId: deviceId,
+      version: desiredFW,
+      interval: desiredInterval,
+      footer: 'desired properties'
+    });
+  })
+}
+
+function getReportedProperties(res, next) {
   registry.getTwin(deviceId, function (err, twin) {
     msg = 'reported properties';
     if (twin.properties.reported.iothubDM != null) {
@@ -69,9 +85,8 @@ function fetchReportedProperties(res, next) {
   });
 }
 
-function setDesiredProperties(res, next, choice, prop) {
+function setDesiredProperty(res, next, choice, prop) {
   registry.getTwin(deviceId, function (err, twin) {
-
     if (err) {
       console.error(err.constructor.name + ': ' + err.message);
     } else {
@@ -89,26 +104,11 @@ function setDesiredProperties(res, next, choice, prop) {
         if (err) {
           console.error('Could not update twin: ' + err.constructor.name + ': ' + err.message);
         } else {
-          console.log(twin.deviceId + ' twin desired property updated successfully');
-          console.log();
-          console.log("Desired: " + JSON.stringify(twin.properties.desired));
-          console.log();
-
-          //queryTwins();
-
+          getDesiredProperties(res, next);
         }
       });
     }
 
-    res.render('twindes', {
-      title: 'utility mgmt console',
-      deviceId: deviceId,
-      location: location,
-      lastRebootTime: lastRebootTime,
-      connType: connType,
-      version: version,
-      footer: 'desired properties saved'
-    });
   });
 
 }
@@ -138,28 +138,29 @@ router.post('/', function (req, res, next) {
 
 router.get('/twin', function (req, res, next) {
   // fetch twin properties here
-  fetchReportedProperties(res, next);
+  getReportedProperties(res, next);
 });
 
 router.get('/des', function (req, res, next) {
-  console.log(JSON.stringify(req.body));
-  res.render('twindes', {
-    title: 'utility mgmt console',
-    deviceId: deviceId,
-    version: version,
-    interval: interval,
-    footer: msg
-  });
+  getDesiredProperties(res, next);
 });
 
 router.post('/des', function (req, res, next) {
-  setDesiredProperties(res, next, req.body.choice, req.body.prop);
+  switch (req.body.action) {
+    case 'fw':
+      setDesiredProperty(res, next, 'fw', req.body.fw)
+      break;
+    case 'interval':
+      setDesiredProperty(res, next, 'interval', req.body.interval)
+      break;
+
+  }
 });
 
 router.post('/twin', function (req, res, next) {
   switch (req.body.action) {
     case 'refresh':
-      fetchReportedProperties(res, next);
+      getReportedProperties(res, next);
       break;
     default:
       msg = req.body.action;

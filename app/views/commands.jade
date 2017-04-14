@@ -1,8 +1,10 @@
 extends layout
 
 block content
-    .jumbotron
+  .panel.panel-default
+    .panel-heading Direct Commands
+    .panel-body
         form(action='/commands', method='post', id='formb')
-          button.btn.btn-space.btn-danger(type='submit', name="action", form='formb', value='reboot') reboot
+          button.btn.btn-danger(type='submit', name="action", form='formb', value='reboot') reboot
 
 

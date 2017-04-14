@@ -1,30 +1,31 @@
 extends layout
 
 block content
-        .jumbotron
-                form(action='/twin', method='post', id='twin')
-                    .form-group.row
-                        label.col-sm-3.col-form-label(for='lastRebootTime') Last Reboot
-                        .col-sm-9
-                            input#lastRebootTime.form-control-static.input-sm(type='text', placeholder=lastRebootTime)
-                    .form-group.row
-                        label.col-sm-3.col-form-label(for='location') Zip Code
-                        .col-sm-9
-                            input#location.form-control-static.input-sm(type='text', placeholder=location)
-                    .form-group.row
-                        label.col-sm-3.col-form-label(for='connType') Connectivity
-                        .col-sm-9
-                            input#connType.form-control-static.input-sm(type='text', placeholder=connType)
-                    .form-group.row
-                        label.col-sm-3.col-form-label(for='version') FW Version
-                        .col-sm-9
-                            input#version.form-control-static.input-sm(type='text', placeholder=version)
-                    .form-group.row
-                        label.col-sm-3.col-form-label(for='interval') Interval
-                        .col-sm-9
-                            input#inputPassword3.form-control-static.input-sm(type='text', placeholder=interval)
-                    .form-group.row
-                        .col-sm-4
-                            button.btn.btn-primary(name="action", type='submit', form='twin', value='refresh') refresh
+  .panel.panel-default
+    .panel-heading Device Reported Properties
+    .panel-body
+        table.table.table-hover
+            thead
+                tr
+                th Property Name
+                th Value
+            tbody
+                tr
+                td Last Reboot
+                td #{lastRebootTime}
+                tr
+                td Location
+                td #{location}
+                tr
+                td Connected via
+                td #{connType}
+                tr
+                td FW version
+                td #{version}
+                tr
+                td Reporting Interval
+                td #{interval}
+        form(action='/twin', method='post', id='twin')
+            button.btn.btn-primary(name="action", type='submit', form='twin', value='refresh') refresh
 
 

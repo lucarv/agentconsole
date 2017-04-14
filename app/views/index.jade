@@ -1,14 +1,16 @@
 extends layout
 
 block content
-    .jumbotron
-        form(action='/', method='post', id='forma')
+  .panel.panel-default
+    .panel-heading Device Selection
+    .panel-body
+      form(action='/', method='post', id='forma')
           fieldset
             .form-group.row
-              .col-sm-6
+              .col-sm-3
                 input.form-control(type='text', name='devID', placeholder='device identity') 
-              .col-sm-6
+              .col-sm-9
                 input.form-control(type='text', name='cs', placeholder='connection string') 
                                          
-        button.btn.btn-space.btn-default(type='submit', name="action", form='forma', value='register') connect
+        button.btn.btn-primary(type='submit', name="action", form='forma', value='register') connect
         

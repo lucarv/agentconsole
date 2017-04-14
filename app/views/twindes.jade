@@ -1,21 +1,23 @@
 extends layout
 
 block content
-    .jumbotron
-        form(action='/des', method='post', id='formb')
-          fieldset
-            .form-group.row
-              .col-sm-3
-                .input-group
-                  span.input-group-btn
-                  select#form.form-control(name = "choice")
-                      option(value='') choose
-                      option(value='fw') fw version
-                      option(value='interval') reporting interval
-              .col-sm-3
-                input.form-control(type='text', name='prop', placeholder='enter desired property')  
+        .panel.panel-default
+            .panel-heading Device Properties
+            .panel-body   
+                form(id='formtwin', action='/des', method='post')
+                    fieldset
+                        .form-group.row
+                            .col-sm-4
+                                .input-group
+                                    span.input-group-btn
+                                        button.btn.btn-primary(name="action", type='submit', form='formtwin', value='fw') submit
+                                    input.form-control(name="fw", type='text', placeholder=version)
+                            .col-sm-4
+                                .input-group
+                                    span.input-group-btn
+                                        button.btn.btn-primary(name="action", type='submit', form='formtwin', value='interval') submit
+                                    input.form-control(name='interval', type='text', placeholder=interval)
 
-        button.btn.btn-primary(type='submit', form='formb', value='Submit') Submit
 
       
  
