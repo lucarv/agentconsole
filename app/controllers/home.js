@@ -12,7 +12,7 @@ var client,
   registry;
 
 var location = 'not yet reported',
-  lastRebootTime = 'not yet reported',
+  lastBlockTime = 'not yet reported',
   connType,
   version,
   interval,
@@ -20,9 +20,23 @@ var location = 'not yet reported',
   msg;
 
 function getDesiredProperties(res, next) {
+  var desiredFW = 'unknown'
+  var desiredInterval = 'unknown'
+
   registry.getTwin(deviceId, function (err, twin) {
-    var desiredFW = twin.properties.desired.fw.version;
-    var desiredInterval = twin.properties.desired.interval.ms;
+    if (err)
+      console.error(err.constructor.name + ': ' + err.message);
+    else {
+
+      if (twin.properties.desired.fw != undefined) 
+        desiredFW = twin.properties.desired.fw.version;
+
+      if (twin.properties.desired.interval != undefined) 
+        desiredInterval = twin.properties.desired.interval.ms;
+
+        console.log('desired fw: ' + desiredFW)
+        console.log('desired interval: ' + desiredInterval)
+      }
 
     res.render('twindes', {
       title: 'utility mgmt console',
@@ -41,7 +55,7 @@ function getReportedProperties(res, next) {
       if (err) {
         msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
       } else {
-        lastRebootTime = twin.properties.reported.iothubDM.reboot.lastReboot;
+        lastBlockTime = twin.properties.reported.iothubDM.block.lastBlock;
       }
     }
     if (twin.properties.reported.location != null) {
@@ -72,11 +86,13 @@ function getReportedProperties(res, next) {
         interval = twin.properties.reported.interval.ms;
       }
     }
+          console.log('twin: ' + JSON.stringify(twin.properties.reported));
+
     res.render('twin', {
       title: 'utility mgmt console',
       deviceId: deviceId,
       location: location,
-      lastRebootTime: lastRebootTime,
+      lastBlockTime: lastBlockTime,
       connType: connType,
       version: version,
       interval: interval,
@@ -168,7 +184,7 @@ router.post('/twin', function (req, res, next) {
         title: 'utility mgmt console',
         deviceId: deviceId,
         location: location,
-        lastRebootTime: lastRebootTime,
+        lastbBlockTime: lastbBlockTime,
         connType: connType,
         version: version,
         footer: msg
@@ -188,8 +204,8 @@ router.get('/commands', function (req, res, next) {
 router.post('/commands', function (req, res, next) {
   console.log('client: ' + client)
   switch (req.body.action) {
-    case 'reboot':
-      var methodName = "reboot";
+    case 'block':
+      var methodName = "block";
       var msg = '';
       var methodParams = {
         methodName: methodName,
@@ -198,12 +214,12 @@ router.post('/commands', function (req, res, next) {
       };
 
       client.invokeDeviceMethod(deviceId, methodParams, function (err, result) {
-        console.log('requested reboot');
+        console.log('requested block');
 
         if (err) {
           msg = "Direct method error: " + err.message;
         } else {
-          msg = "Successfully invoked the device to reboot.";
+          msg = "Successfully invoked the device to cut supply.";
         }
 
         res.render('commands', {
