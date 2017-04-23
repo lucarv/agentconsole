@@ -32,7 +32,9 @@ html(lang='en')
       #navbar-inverse.collapse.navbar-collapse
         ul.nav.navbar-nav           
           li.active 
-            a( href="/") Select Device            
+            a( href="/") Select Grid by CS  
+          li 
+            a( href="/search") Search        
           li.dropdown
             a.dropdown-toggle(href='#', data-toggle='dropdown')
               | Device Twin 
@@ -44,11 +46,13 @@ html(lang='en')
                 a(href='/des') Desired
           li 
             a( href="/commands") Commands
+
         ul.nav.navbar-nav.navbar-right
           li.ph device id
-          form.navbar-form.navbar-left
+          form.navbar-form.navbar-left(action='/device', method='post', id='forma')
             .form-group
-              input.form-control(type='text', placeholder=deviceId)
+              input.form-control(type='text', name='devID', placeholder=deviceId)
+              button.btn.btn-space.btn-primary(type='submit', name="action", form='forma', value='register') connect
 
 
     block content

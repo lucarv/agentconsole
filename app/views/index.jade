@@ -2,15 +2,14 @@ extends layout
 
 block content
   .panel.panel-default
-    .panel-heading Device Selection
+    .panel-heading Select Customer via Connection String
     .panel-body
-      form(action='/', method='post', id='forma')
+      form(action='/', method='post', id='formCS')
           fieldset
             .form-group.row
-              .col-sm-3
-                input.form-control(type='text', name='devID', placeholder='device identity') 
-              .col-sm-9
-                input.form-control(type='text', name='cs', placeholder='connection string') 
-                                         
-        button.btn.btn-primary(type='submit', name="action", form='forma', value='register') connect
+              .col-sm-10
+                label Connection String
+                input.form-control(type='text', name='cs', placeholder='enter connection string') 
+              .col-sm-2               
+                button.btn.btn-primary(type='submit', name="action", form='formCS', value='register') connect
         

@@ -3,9 +3,10 @@
 var express = require('express'),
   router = express.Router();
 
+var iothub = require('azure-iothub');
 var Registry = require('azure-iothub').Registry;
 var Client = require('azure-iothub').Client;
-var deviceId = '';
+var deviceId = 'not selected';
 var connectionString = '';
 
 var client,
@@ -19,6 +20,35 @@ var location = 'not yet reported',
   lastRead,
   msg;
 
+var queryTwins = function (prop, key, res, next) {
+  var devices = [];
+
+  var registry = iothub.Registry.fromConnectionString(connectionString);
+
+  switch (prop) {
+    case 'zip':
+      var query = registry.createQuery("SELECT * FROM devices WHERE properties.reported.location.zipcode = '" + key + '\'', 100);
+      break;
+    case 'version':
+      console.log('searching: ' + JSON.stringify(twin.properties.reported.fw_version.version));
+      var query = registry.createQuery("SELECT * FROM devices WHERE properties.reported.fw_version.version = '" + key + '\'', 100);
+      break;
+  }
+  query.nextAsTwin(function (err, results) {
+    if (err) {
+      console.error('Failed to fetch the results: ' + err.message);
+    }
+    else {
+      devices.push(results.map(function (twin) { return twin.deviceId }));
+      res.render('queryresults', {
+        title: 'utility mgmt console',
+        deviceId: deviceId,
+        footer: msg
+      });
+    }
+  })
+}
+
 function getDesiredProperties(res, next) {
   var desiredFW = 'unknown'
   var desiredInterval = 'unknown'
@@ -28,15 +58,15 @@ function getDesiredProperties(res, next) {
       console.error(err.constructor.name + ': ' + err.message);
     else {
 
-      if (twin.properties.desired.fw != undefined) 
+      if (twin.properties.desired.fw != undefined)
         desiredFW = twin.properties.desired.fw.version;
 
-      if (twin.properties.desired.interval != undefined) 
+      if (twin.properties.desired.interval != undefined)
         desiredInterval = twin.properties.desired.interval.ms;
 
-        console.log('desired fw: ' + desiredFW)
-        console.log('desired interval: ' + desiredInterval)
-      }
+      console.log('desired fw: ' + desiredFW)
+      console.log('desired interval: ' + desiredInterval)
+    }
 
     res.render('twindes', {
       title: 'utility mgmt console',
@@ -86,7 +116,7 @@ function getReportedProperties(res, next) {
         interval = twin.properties.reported.interval.ms;
       }
     }
-          console.log('twin: ' + JSON.stringify(twin.properties.reported));
+    console.log('twin: ' + JSON.stringify(twin.properties.reported));
 
     res.render('twin', {
       title: 'utility mgmt console',
@@ -124,38 +154,35 @@ function setDesiredProperty(res, next, choice, prop) {
         }
       });
     }
-
   });
-
 }
 
 module.exports = function (app) {
   app.use('/', router);
 };
 
-router.get('/', function (req, res, next) {
-  res.render('index', {
-    title: 'utility mgmt console'
+
+
+router.get('/device', function (req, res, next) {
+  console.log('ferk')
+  res.render('device', {
+    title: 'utility mgmt console',
+    deviceId: deviceId,
+    footer: 'enter device id'
   });
 });
 
-router.post('/', function (req, res, next) {
-  var connectionString = req.body.cs;
-  registry = Registry.fromConnectionString(connectionString);
-  client = Client.fromConnectionString(connectionString);
+router.post('/device', function (req, res, next) {
   deviceId = req.body.devID;
 
-  res.render('index', {
+  res.render('device', {
     title: 'utility mgmt console',
     deviceId: deviceId,
     footer: 'successfully connected'
   });
 });
 
-router.get('/twin', function (req, res, next) {
-  // fetch twin properties here
-  getReportedProperties(res, next);
-});
+
 
 router.get('/des', function (req, res, next) {
   getDesiredProperties(res, next);
@@ -171,6 +198,18 @@ router.post('/des', function (req, res, next) {
       break;
 
   }
+});
+
+router.get('/twin', function (req, res, next) {
+  console.log('device id on get: ' + deviceId)
+  if (deviceId != 'not selected')
+    // fetch twin properties here
+    getReportedProperties(res, next);
+  else
+    res.render('twin', {
+      title: 'utility mgmt console',
+      footer: 'no device selected'
+    });
 });
 
 router.post('/twin', function (req, res, next) {
@@ -192,6 +231,31 @@ router.post('/twin', function (req, res, next) {
       break;
   }
 
+});
+
+
+
+router.get('/search', function (req, res, next) {
+  console.log('search')
+  res.render('search', {
+    title: 'utility mgmt console',
+    deviceId: deviceId,
+    footer: 'search form button pressed'
+  });
+});
+
+router.post('/search', function (req, res, next) {
+  console.log('search: ' + JSON.stringify(req.body))
+  switch (req.body.action) {
+    case 'version':
+      queryTwins('version', req.body.fw, res, next)
+      var msg = 'searching fw' + req.body.fw
+      break;
+    case 'zip':
+      queryTwins('zip', req.body.zip, res, next)
+      var msg = 'searching zip' + req.body.zip
+      break;
+  }
 });
 
 router.get('/commands', function (req, res, next) {
@@ -232,5 +296,21 @@ router.post('/commands', function (req, res, next) {
   }
 });
 
+router.get('/', function (req, res, next) {
+  res.render('index', {
+    title: 'utility mgmt console'
+  });
+});
 
+router.post('/', function (req, res, next) {
+  connectionString = req.body.cs;
+  var hubName = connectionString.substring(connectionString.indexOf('=') + 1, connectionString.indexOf('.'));
+  registry = Registry.fromConnectionString(connectionString);
+  client = Client.fromConnectionString(connectionString);
+  console.log('start: ' + deviceId)
+  res.render('search', {
+    title: 'utility mgmt console',
+    footer: 'successfully connected to: ' + hubName
+  });
+});
 
