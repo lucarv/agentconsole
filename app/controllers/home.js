@@ -20,6 +20,17 @@ var location = 'not yet reported',
   lastRead,
   msg;
 
+
+function printDeviceInfo(deviceInfo, res) {
+
+  if (deviceInfo)
+    console.log('Device ID: ' + deviceInfo.deviceId);
+  else
+    console.log('deviceInfo: ' + JSON.stringify(deviceInfo))
+
+
+}
+
 var queryTwins = function (prop, key, res, next) {
   var devices = [];
 
@@ -161,10 +172,7 @@ module.exports = function (app) {
   app.use('/', router);
 };
 
-
-
 router.get('/device', function (req, res, next) {
-  console.log('ferk')
   res.render('device', {
     title: 'utility mgmt console',
     deviceId: deviceId,
@@ -175,10 +183,23 @@ router.get('/device', function (req, res, next) {
 router.post('/device', function (req, res, next) {
   deviceId = req.body.devID;
 
-  res.render('device', {
-    title: 'utility mgmt console',
-    deviceId: deviceId,
-    footer: 'successfully connected'
+  //check if device id has been provisioned
+  registry.get(deviceId, function (err, deviceInfo, result) {
+    if (err) {
+      console.log('ERROR: ' + err)
+      res.render('device', {
+        title: 'utility mgmt console',
+        deviceId: 'incorrect device id',
+        footer: 'enter device id'
+      });
+    }
+
+    if (deviceInfo)
+      res.render('commands', {
+        title: 'utility mgmt console',
+        deviceId: deviceId,
+        footer: 'successfully connected to ' + deviceId
+      });
   });
 });
 
@@ -232,8 +253,6 @@ router.post('/twin', function (req, res, next) {
   }
 
 });
-
-
 
 router.get('/search', function (req, res, next) {
   console.log('search')
