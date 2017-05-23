@@ -26,25 +26,27 @@ html(lang='en')
             span.icon-bar
             span.icon-bar
             span.icon-bar
-        a.navbar-brand(href="#") 
+        a.navbar-brand(href="#")
             <img src="img/brand.png" width="22" height="22" alt="brand">
 
       #navbar-inverse.collapse.navbar-collapse
-        ul.nav.navbar-nav           
-          li.active 
-            a( href="/") Select Grid by CS  
-          li 
-            a( href="/search") Search        
+        ul.nav.navbar-nav
+          li.active
+            a( href="/") Select Grid by CS
+          li
+            a( href="/search") Search
           li.dropdown
             a.dropdown-toggle(href='#', data-toggle='dropdown')
-              | Device Twin 
+              | Device Twin
               b.caret
             ul.dropdown-menu
               li
                 a(href='/twin') Reported
               li
                 a(href='/des') Desired
-          li 
+              li
+                a(href='/tags') Tags
+          li
             a( href="/commands") Commands
 
         ul.nav.navbar-nav.navbar-right

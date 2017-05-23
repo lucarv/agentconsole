@@ -27,8 +27,6 @@ function printDeviceInfo(deviceInfo, res) {
     console.log('Device ID: ' + deviceInfo.deviceId);
   else
     console.log('deviceInfo: ' + JSON.stringify(deviceInfo))
-
-
 }
 
 var queryTwins = function (prop, key, res, next) {
@@ -38,7 +36,7 @@ var queryTwins = function (prop, key, res, next) {
 
   switch (prop) {
     case 'zip':
-      var query = registry.createQuery("SELECT * FROM devices WHERE properties.reported.location.zipcode = '" + key + '\'', 100);
+      var query = registry.createQuery("SELECT * FROM devices WHERE tags.location.zipcode = '" + key + '\'', 100);
       break;
     case 'version':
       console.log('searching: ' + JSON.stringify(twin.properties.reported.fw_version.version));
@@ -99,20 +97,6 @@ function getReportedProperties(res, next) {
         lastBlockTime = twin.properties.reported.iothubDM.block.lastBlock;
       }
     }
-    if (twin.properties.reported.location != null) {
-      if (err) {
-        msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
-      } else {
-        location = twin.properties.reported.location.zipcode;
-      }
-    }
-    if (twin.properties.reported.connectivity != null) {
-      if (err) {
-        msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
-      } else {
-        connType = twin.properties.reported.connectivity.type;
-      }
-    }
     if (twin.properties.reported.fw_version != null) {
       if (err) {
         msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
@@ -127,14 +111,11 @@ function getReportedProperties(res, next) {
         interval = twin.properties.reported.interval.ms;
       }
     }
-    console.log('twin: ' + JSON.stringify(twin.properties.reported));
 
     res.render('twin', {
       title: 'utility mgmt console',
       deviceId: deviceId,
-      location: location,
       lastBlockTime: lastBlockTime,
-      connType: connType,
       version: version,
       interval: interval,
       footer: 'reported properties'
@@ -203,7 +184,32 @@ router.post('/device', function (req, res, next) {
   });
 });
 
+router.get('/tags', function (req, res, next) {
 
+  if (deviceId == 'not selected')
+    res.render('done', {
+      title: 'utility mgmt console',
+      msg: 'no device selected, choose device on the top bar or via search'
+    });
+  else
+    registry.getTwin(deviceId, function (err, twin) {
+      if (err) {
+        console.error(err.constructor.name + ': ' + err.message);
+        res.render('done', {
+          title: 'utility mgmt console',
+          msg: 'no device selected, choose device on the top bar or via search'
+        });
+      } else {
+
+        res.render('tags', {
+          title: 'utility mgmt console',
+          location: twin.tags.location.zipcode,
+          connType: twin.tags.connectivity.type
+        });
+        console.log(twin.tags)
+      }
+    });
+});
 
 router.get('/des', function (req, res, next) {
   getDesiredProperties(res, next);
@@ -327,8 +333,9 @@ router.post('/', function (req, res, next) {
   registry = Registry.fromConnectionString(connectionString);
   client = Client.fromConnectionString(connectionString);
   console.log('start: ' + deviceId)
-  res.render('search', {
+  res.render('done', {
     title: 'utility mgmt console',
+    msg: 'select device via top bar or search menu',
     footer: 'successfully connected to: ' + hubName
   });
 });
