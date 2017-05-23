@@ -48,10 +48,13 @@ var queryTwins = function (prop, key, res, next) {
       console.error('Failed to fetch the results: ' + err.message);
     }
     else {
-      devices.push(results.map(function (twin) { return twin.deviceId }));
+
+      for (var i = 0; i < results.length; i++)
+        devices.push(results[i].deviceId)
+
       res.render('queryresults', {
         title: 'utility mgmt console',
-        deviceId: deviceId,
+        devices: devices,
         footer: msg
       });
     }
@@ -149,6 +152,9 @@ function setDesiredProperty(res, next, choice, prop) {
   });
 }
 
+/* ------------------------------------
+ROUTING
+------------------------------------ */
 module.exports = function (app) {
   app.use('/', router);
 };
@@ -321,6 +327,15 @@ router.post('/commands', function (req, res, next) {
   }
 });
 
+router.post('/devsel', function (req, res, next) {
+  deviceId = Object.keys(req.body)[0];
+
+  res.render('device', {
+    title: 'utility mgmt console',
+    deviceId: deviceId
+  });
+});
+
 router.get('/', function (req, res, next) {
   res.render('index', {
     title: 'utility mgmt console'
@@ -332,7 +347,6 @@ router.post('/', function (req, res, next) {
   var hubName = connectionString.substring(connectionString.indexOf('=') + 1, connectionString.indexOf('.'));
   registry = Registry.fromConnectionString(connectionString);
   client = Client.fromConnectionString(connectionString);
-  console.log('start: ' + deviceId)
   res.render('done', {
     title: 'utility mgmt console',
     msg: 'select device via top bar or search menu',
