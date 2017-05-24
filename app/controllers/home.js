@@ -30,17 +30,20 @@ function printDeviceInfo(deviceInfo, res) {
 }
 
 var queryTwins = function (prop, key, res, next) {
+  // --------------------------------------
+  // task one: create queries to select all
+  // devices on a location and with a FW
+  // --------------------------------------
   var devices = [];
 
   var registry = iothub.Registry.fromConnectionString(connectionString);
 
   switch (prop) {
     case 'zip':
-      var query = registry.createQuery("SELECT * FROM devices WHERE tags.location.zipcode = '" + key + '\'', 100);
+      //YOUR CODE GOES HERE
       break;
     case 'version':
-      console.log('searching: ' + JSON.stringify(twin.properties.reported.fw_version.version));
-      var query = registry.createQuery("SELECT * FROM devices WHERE properties.reported.fw_version.version = '" + key + '\'', 100);
+      //YOUR CODE GOES HERE
       break;
   }
   query.nextAsTwin(function (err, results) {
@@ -91,65 +94,33 @@ function getDesiredProperties(res, next) {
 }
 
 function getReportedProperties(res, next) {
-  registry.getTwin(deviceId, function (err, twin) {
-    msg = 'reported properties';
-    if (twin.properties.reported.iothubDM != null) {
-      if (err) {
-        msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
-      } else {
-        lastBlockTime = twin.properties.reported.iothubDM.block.lastBlock;
-      }
-    }
-    if (twin.properties.reported.fw_version != null) {
-      if (err) {
-        msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
-      } else {
-        version = twin.properties.reported.fw_version.version;
-      }
-    }
-    if (twin.properties.reported.interval != null) {
-      if (err) {
-        msg = 'Could not query twins: ' + err.constructor.name + ': ' + err.message;
-      } else {
-        interval = twin.properties.reported.interval.ms;
-      }
-    }
+  // -------------------------------------------
+  // task two: read all the reported properties
+  // stored in the twin document
+  // save them appropriately to display in UI
+  // -------------------------------------------
 
-    res.render('twin', {
-      title: 'utility mgmt console',
-      deviceId: deviceId,
-      lastBlockTime: lastBlockTime,
-      version: version,
-      interval: interval,
-      footer: 'reported properties'
-    });
+  // YOUR CODE GOES HERE
+
+  res.render('twin', {
+    title: 'utility mgmt console',
+    deviceId: deviceId,
+    lastBlockTime: lastBlockTime,
+    version: version,
+    interval: interval,
+    footer: 'reported properties'
   });
 }
 
 function setDesiredProperty(res, next, choice, prop) {
-  registry.getTwin(deviceId, function (err, twin) {
-    if (err) {
-      console.error(err.constructor.name + ': ' + err.message);
-    } else {
+  // ------------------------------------------
+  // task three: set desired property 'choice'
+  // with value 'prop' and store it in the twin
+  // JSON document
+  // ------------------------------------------
 
-      switch (choice) {
-        case 'fw':
-          var patch = { properties: { desired: { fw: { version: prop } } } };
-          break;
+  // YOUR CODE GOES HERE
 
-        case 'interval':
-          var patch = { properties: { desired: { interval: { ms: prop } } } };
-          break;
-      }
-      twin.update(patch, function (err) {
-        if (err) {
-          console.error('Could not update twin: ' + err.constructor.name + ': ' + err.message);
-        } else {
-          getDesiredProperties(res, next);
-        }
-      });
-    }
-  });
 }
 
 /* ------------------------------------
@@ -236,7 +207,6 @@ router.post('/des', function (req, res, next) {
 router.get('/twin', function (req, res, next) {
   console.log('device id on get: ' + deviceId)
   if (deviceId != 'not selected')
-    // fetch twin properties here
     getReportedProperties(res, next);
   else
     res.render('twin', {
@@ -302,28 +272,19 @@ router.post('/commands', function (req, res, next) {
     case 'block':
       var methodName = "block";
       var msg = '';
-      var methodParams = {
-        methodName: methodName,
-        payload: null,
-        timeoutInSeconds: 30
-      };
+      //-------------------------------
+      // task four: invoke block method
+      //-------------------------------
 
-      client.invokeDeviceMethod(deviceId, methodParams, function (err, result) {
-        console.log('requested block');
+      // YOUR CODE GOES HERE
 
-        if (err) {
-          msg = "Direct method error: " + err.message;
-        } else {
-          msg = "Successfully invoked the device to cut supply.";
-        }
-
-        res.render('commands', {
-          title: 'utility mgmt console',
-          deviceId: deviceId,
-          footer: msg
-        });
+      res.render('commands', {
+        title: 'utility mgmt console',
+        deviceId: deviceId,
+        footer: msg
       });
-      break;
+  });
+break;
   }
 });
 
@@ -347,6 +308,7 @@ router.post('/', function (req, res, next) {
   var hubName = connectionString.substring(connectionString.indexOf('=') + 1, connectionString.indexOf('.'));
   registry = Registry.fromConnectionString(connectionString);
   client = Client.fromConnectionString(connectionString);
+
   res.render('done', {
     title: 'utility mgmt console',
     msg: 'select device via top bar or search menu',
